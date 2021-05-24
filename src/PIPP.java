@@ -10,6 +10,15 @@ import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 
 public class PIPP {
 
@@ -103,7 +112,7 @@ public class PIPP {
 		frame.getContentPane().add(textid);
 		textid.setColumns(10);
 		
-		JLabel parola = new JLabel("Password");
+		JLabel parola = new JLabel("Topic");
 		parola.setBounds(54, 117, 62, 29);
 		frame.getContentPane().add(parola);
 		parola.setVisible(false);
@@ -135,7 +144,35 @@ public class PIPP {
 		JButton adauga = new JButton("Adauga");
 		adauga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				textchat.append(textuser.getText()+ " : " + texttext.getText()+ "\n");
+				String topic        = textparola.getText();
+				String content      = texttext.getText();
+				int qos             = 2;
+				String port = textport.getText();
+				String broker = "tcp://" + texthost.getText() + ":" + port;
+				String clientId     = textid.getText();
+				MemoryPersistence persistence = new MemoryPersistence();  
+
+				try {			
+				    MqttClient sampleClient = new MqttClient(broker, clientId, persistence);
+				    MqttConnectOptions connOpts = new MqttConnectOptions();
+				    System.out.println("Connecting to broker: "+broker);
+				    sampleClient.connect(connOpts);
+				    System.out.println("Connected");
+				    System.out.println("Publishing message: "+content);
+				    MqttMessage message = new MqttMessage(content.getBytes());
+				    message.setQos(qos);
+				    sampleClient.publish(topic, message);
+				    System.out.println("Message published");
+				    //sampleClient.setCallback(this);
+				    textchat.append(textid.getText()+ " : " + texttext.getText()+ "\n");
+				} catch(MqttException me) {
+					textchat.append("ERROR : reason "+me.getReasonCode() + "\n");
+					textchat.append("ERROR : msg "+me.getMessage() + "\n");
+					textchat.append("ERROR : loc "+me.getLocalizedMessage() + "\n");
+					textchat.append("ERROR : cause "+me.getCause() + "\n");
+					textchat.append("ERROR : excep "+me);
+				    me.printStackTrace();
+				}
 				texttext.setText(null);
 			}
 		});
@@ -215,23 +252,7 @@ public class PIPP {
 		});
 		back.setBounds(144, 227, 106, 38);
 		frame.getContentPane().add(back);
-		
-		
-		back.setVisible(false);
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+	
+		back.setVisible(false);		
 	}
 }
