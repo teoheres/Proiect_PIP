@@ -1,5 +1,6 @@
-import java.awt.EventQueue;
+package pack;
 
+import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
@@ -9,19 +10,15 @@ import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
+import java.util.concurrent.CountDownLatch;
 
-public class PIPP {
-
+public class PIPP{    
 	private JFrame frame;
 	private JTextField textuser;
 	private JTextField texthost;
@@ -34,18 +31,20 @@ public class PIPP {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					PIPP window = new PIPP();
 					window.frame.setVisible(true);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
-
+	
 	/**
 	 * Create the application.
 	 */
@@ -56,6 +55,7 @@ public class PIPP {
 	/**
 	 * Initialize the contents of the frame.
 	 */
+
 	private void initialize() {
 		frame = new JFrame("Window 1");
 		frame.setBounds(100, 100, 589, 542);
@@ -149,31 +149,41 @@ public class PIPP {
 				int qos             = 2;
 				String port = textport.getText();
 				String broker = "tcp://" + texthost.getText() + ":" + port;
-				String clientId     = textid.getText();
-				MemoryPersistence persistence = new MemoryPersistence();  
+			    try {
+			        MqttClient mqttClient = new MqttClient(broker, topic);
+			        MqttConnectOptions connOpts = new MqttConnectOptions();
+			        connOpts.setCleanSession(true);
+			        mqttClient.connect(connOpts);
+			        MqttMessage message = new MqttMessage(content.getBytes());
+			        message.setQos(qos);
+			        message.setPayload(content.getBytes());
+			        mqttClient.publish(topic, message);
+					textchat.append("\n" + texttext.getText()+ "\n");
+			        final CountDownLatch latch = new CountDownLatch(1);
+			        mqttClient.setCallback(new MqttCallback() {
+			            public void messageArrived(String topic, MqttMessage message) throws Exception {
+			            	textchat.append(new String(message.getPayload()));
+			                latch.countDown();
+			            }
+			            public void connectionLost(Throwable cause) {
+			                System.out.println("Messaging lost!" + cause.getMessage());
+			                latch.countDown();
+			            }
 
-				try {			
-				    MqttClient sampleClient = new MqttClient(broker, clientId, persistence);
-				    MqttConnectOptions connOpts = new MqttConnectOptions();
-				    System.out.println("Connecting to broker: "+broker);
-				    sampleClient.connect(connOpts);
-				    System.out.println("Connected");
-				    System.out.println("Publishing message: "+content);
-				    MqttMessage message = new MqttMessage(content.getBytes());
-				    message.setQos(qos);
-				    sampleClient.publish(topic, message);
-				    System.out.println("Message published");
-				    //sampleClient.setCallback(this);
-				    textchat.append(textid.getText()+ " : " + texttext.getText()+ "\n");
-				} catch(MqttException me) {
-					textchat.append("ERROR : reason "+me.getReasonCode() + "\n");
-					textchat.append("ERROR : msg "+me.getMessage() + "\n");
-					textchat.append("ERROR : loc "+me.getLocalizedMessage() + "\n");
-					textchat.append("ERROR : cause "+me.getCause() + "\n");
-					textchat.append("ERROR : excep "+me);
-				    me.printStackTrace();
-				}
-				texttext.setText(null);
+			            public void deliveryComplete(IMqttDeliveryToken token) {
+			            }
+
+			        });
+			        mqttClient.subscribe(topic, 0);
+			    } catch (MqttException me) {
+			    	textchat.append("\n ERROR: reason " + me.getReasonCode());
+			    	textchat.append("\n ERROR: msg " + me.getMessage());
+			    	textchat.append("\n ERROR: loc " + me.getLocalizedMessage());
+			    	textchat.append("\n ERROR: cause " + me.getCause());
+			    	textchat.append("\n ERROR: excep " + me);
+			        me.printStackTrace();
+			    }
+				texttext.setText(null);	
 			}
 		});
 		adauga.setBounds(436, 412, 114, 65);
@@ -188,8 +198,7 @@ public class PIPP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String nume = textuser.getText();
-				System.out.println(nume + " Alo, buna dimineata");
+				String nume = textid.getText();
 				halba.setVisible(true);
 				textonline.append(nume);
 				textchat.setVisible(true);
@@ -202,7 +211,6 @@ public class PIPP {
 				textparola.setVisible(false);
 				login.setVisible(false);
 				halba.setVisible(false);
-				
 				
 			}
 		});
@@ -252,7 +260,6 @@ public class PIPP {
 		});
 		back.setBounds(144, 227, 106, 38);
 		frame.getContentPane().add(back);
-	
-		back.setVisible(false);		
+		back.setVisible(false);
 	}
 }
