@@ -1,15 +1,28 @@
+package pack;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+//import org.eclipse.paho.client.mqttv3.MqttException;
+//import org.eclipse.paho.client.mqttv3.MqttMessage;
+
 import javax.swing.JButton;
 
-import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+//BEGIN ######################### HiveMQTT Broker Imports ################################
+
+import com.hivemq.client.mqtt.MqttClient;
+import com.hivemq.client.mqtt.mqtt5.Mqtt5BlockingClient;
+
+import static com.hivemq.client.mqtt.MqttGlobalPublishFilter.ALL;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+//END ######################### HiveMQTT Broker Imports ################################
 
 public class PIPP {
 
@@ -20,7 +33,8 @@ public class PIPP {
 	private JTextField textsubt;
 	private JTextField textpubt;
 	private JTextField texttext;
-
+	int connected = 0;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -42,8 +56,10 @@ public class PIPP {
 	 */
 	public PIPP() {
 		initialize();
+		
 	}
 
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -119,7 +135,41 @@ public class PIPP {
 		JButton adauga = new JButton("Adauga");
 		adauga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				textchat.append(textuser.getText()+ " : " + texttext.getText()+ "\n");
+				final String broker = texthost.getText();
+				final String username = textuser.getText();
+				final String password = textparola.getText();
+				final String pubtopic = textpubt.getText();
+				final String subtopic = textsubt.getText();
+				final String mesaj = texttext.getText();
+				
+		        final Mqtt5BlockingClient client = MqttClient.builder()
+		                .useMqttVersion5()
+		                .serverHost(broker)
+		                .serverPort(8883)
+		                .sslWithDefaultConfig()
+		                .buildBlocking();
+
+		        client.connectWith()
+		                .simpleAuth()
+		                .username(username)
+		                .password(UTF_8.encode(password))
+		                .applySimpleAuth()
+		                .send();
+
+		        client.subscribeWith()
+		                .topicFilter(subtopic)
+		                .send();
+
+		        client.toAsync().publishes(ALL, publish -> {
+		            textchat.append(" -> " + UTF_8.decode(publish.getPayload().get()) + "\n");
+		            client.disconnect();
+		        });
+
+		        client.publishWith()
+		                .topic(pubtopic)
+		                .payload(UTF_8.encode(mesaj))
+		                .send();
+			        
 				texttext.setText(null);
 			}
 		});
@@ -135,7 +185,6 @@ public class PIPP {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String nume = textuser.getText();
-				System.out.println(nume + " Alo, buna dimineata");
 				textonline.append(nume);
 				textchat.setVisible(true);
 				texttext.setVisible(true);
@@ -151,27 +200,9 @@ public class PIPP {
 				pubtopic.setVisible(false);
 				subtopic.setVisible(false);
 				textsubt.setVisible(false);
-				textparola.setVisible(false);
-				
-				
-				
+				textparola.setVisible(false);		
 				
 			}
 		});
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 	}
 }
