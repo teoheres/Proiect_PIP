@@ -1,6 +1,8 @@
 package pack;
 import java.awt.EventQueue;
+import java.awt.Image;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
@@ -13,6 +15,8 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
+import javax.swing.JScrollPane;
 
 //BEGIN ######################### HiveMQTT Broker Imports ################################
 
@@ -114,23 +118,25 @@ public class PIPP {
 		frame.getContentPane().add(textpubt);
 		textpubt.setColumns(10);
 		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 49, 571, 273);
+		frame.getContentPane().add(scrollPane);
+		
 		JTextArea textchat = new JTextArea();
 		textchat.setBounds(41, 77, 490, 351);
 		frame.getContentPane().add(textchat);
 		textchat.setVisible(false);
 		textchat.setEditable(false);
 		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(10, 335, 449, 32);
+		frame.getContentPane().add(scrollPane_1);
+		
 		JTextArea textonline = new JTextArea();
 		textonline.setBounds(41, 37, 490, 29);
 		frame.getContentPane().add(textonline);
 		textonline.setVisible(false);
 		textonline.setEditable(false);
-		
-		texttext = new JTextField();
-		texttext.setBounds(41, 439, 385, 38);
-		frame.getContentPane().add(texttext);
-		texttext.setColumns(10);
-		texttext.setVisible(false);
 		
 		JButton adauga = new JButton("Adauga");
 		adauga.addActionListener(new ActionListener() {
@@ -180,16 +186,26 @@ public class PIPP {
 		JButton login = new JButton("Connect");
 		login.setBounds(232, 272, 108, 38);
 		frame.getContentPane().add(login);
+		
+		JLabel bg = new JLabel("");
+		Image jpg = new ImageIcon(this.getClass().getResource("comunication.jpg")).getImage();
+		bg.setIcon(new ImageIcon(jpg));
+		bg.setBounds(0, -52, 640, 491);
+		frame.getContentPane().add(bg);
+		
 		login.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String nume = textuser.getText();
-				textonline.append(nume);
+				System.out.println(nume + " bine ai venit pe chat-ul nostru.");
+				numechat.setText("Nume client : "+ nume);
 				textchat.setVisible(true);
 				texttext.setVisible(true);
 				textonline.setVisible(true);
 				adauga.setVisible(true);
+				scrollPane.setVisible(true);
+				scrollPane_1.setVisible(true);
+				numechat.setVisible(true);	
 				user.setVisible(false);
 				textuser.setVisible(false);
 				parola.setVisible(false);
@@ -200,7 +216,8 @@ public class PIPP {
 				pubtopic.setVisible(false);
 				subtopic.setVisible(false);
 				textsubt.setVisible(false);
-				textparola.setVisible(false);		
+				textparola.setVisible(false);
+							
 				
 			}
 		});
