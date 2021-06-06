@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.Color;
 import javax.swing.JScrollPane;
 
+
 //BEGIN ######################### HiveMQTT Broker Imports ################################
 
 import com.hivemq.client.mqtt.MqttClient;
@@ -36,9 +37,7 @@ public class PIPP {
 	private JTextField textparola;
 	private JTextField textsubt;
 	private JTextField textpubt;
-	private JTextField texttext;
-	int connected = 0;
-	
+
 	/**
 	 * Launch the application.
 	 */
@@ -60,20 +59,19 @@ public class PIPP {
 	 */
 	public PIPP() {
 		initialize();
-		
 	}
 
-	
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
 		frame = new JFrame("Window 1");
-		frame.setBounds(100, 100, 589, 542);
+		frame.setBounds(100, 100, 607, 417);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
 		JLabel user = new JLabel("Username");
+		user.setForeground(Color.WHITE);
 		user.setBounds(68, 195, 76, 29);
 		frame.getContentPane().add(user);
 		
@@ -83,16 +81,25 @@ public class PIPP {
 		textuser.setColumns(10);
 		
 		JLabel host = new JLabel("Host");
+		host.setForeground(Color.WHITE);
 		host.setBounds(69, 76, 62, 27);
 		frame.getContentPane().add(host);
 		
 		JLabel pubtopic = new JLabel("PubTopic");
-		pubtopic.setBounds(70, 106, 61, 38);
+		pubtopic.setForeground(Color.WHITE);
+		pubtopic.setBounds(68, 106, 63, 38);
 		frame.getContentPane().add(pubtopic);
 		
 		JLabel subtopic = new JLabel("SubTopic");
-		subtopic.setBounds(69, 155, 54, 29);
+		subtopic.setForeground(Color.WHITE);
+		subtopic.setBounds(68, 155, 55, 29);
 		frame.getContentPane().add(subtopic);
+		
+		JLabel numechat = new JLabel("");
+		numechat.setForeground(Color.WHITE);
+		numechat.setBounds(232, 16, 165, 22);
+		frame.getContentPane().add(numechat);
+		numechat.setVisible(false);
 		
 		texthost = new JTextField();
 		texthost.setBounds(154, 75, 286, 29);
@@ -110,6 +117,7 @@ public class PIPP {
 		textsubt.setColumns(10);
 		
 		JLabel parola = new JLabel("Password");
+		parola.setForeground(Color.WHITE);
 		parola.setBounds(68, 235, 62, 29);
 		frame.getContentPane().add(parola);
 		
@@ -123,20 +131,20 @@ public class PIPP {
 		frame.getContentPane().add(scrollPane);
 		
 		JTextArea textchat = new JTextArea();
-		textchat.setBounds(41, 77, 490, 351);
-		frame.getContentPane().add(textchat);
+		scrollPane.setViewportView(textchat);
 		textchat.setVisible(false);
 		textchat.setEditable(false);
+		scrollPane.setVisible(false);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBounds(10, 335, 449, 32);
 		frame.getContentPane().add(scrollPane_1);
 		
-		JTextArea textonline = new JTextArea();
-		textonline.setBounds(41, 37, 490, 29);
-		frame.getContentPane().add(textonline);
-		textonline.setVisible(false);
-		textonline.setEditable(false);
+		JTextArea texttext = new JTextArea();
+		scrollPane_1.setViewportView(texttext);
+		texttext.setColumns(10);
+		texttext.setVisible(false);
+		scrollPane_1.setVisible(false);
 		
 		JButton adauga = new JButton("Adauga");
 		adauga.addActionListener(new ActionListener() {
@@ -179,7 +187,7 @@ public class PIPP {
 				texttext.setText(null);
 			}
 		});
-		adauga.setBounds(436, 439, 95, 38);
+		adauga.setBounds(473, 335, 108, 32);
 		frame.getContentPane().add(adauga);
 		adauga.setVisible(false);
 		
@@ -197,15 +205,12 @@ public class PIPP {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				String nume = textuser.getText();
 				System.out.println(nume + " bine ai venit pe chat-ul nostru.");
 				numechat.setText("Nume client : "+ nume);
 				textchat.setVisible(true);
 				texttext.setVisible(true);
-				textonline.setVisible(true);
 				adauga.setVisible(true);
-				scrollPane.setVisible(true);
-				scrollPane_1.setVisible(true);
-				numechat.setVisible(true);	
 				user.setVisible(false);
 				textuser.setVisible(false);
 				parola.setVisible(false);
@@ -217,9 +222,31 @@ public class PIPP {
 				subtopic.setVisible(false);
 				textsubt.setVisible(false);
 				textparola.setVisible(false);
-							
+				scrollPane.setVisible(true);
+				scrollPane_1.setVisible(true);
+				numechat.setVisible(true);
+				
+				
+				
+				
+				
 				
 			}
 		});
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 }
